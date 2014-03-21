@@ -70,7 +70,7 @@ var wipeTmpFolder = function() {
             fs.unlink(tmpFolder+'/'+files[i]);
         }
     });
-}
+};
 
 // Wipe the tmpFolder when closing the app (this frees up disk space)
 win.on('close', function(){
@@ -82,38 +82,32 @@ win.on('close', function(){
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 
-// Not debugging, hide all messages!
-if (!isDebug) {
-    console.log = function () {};
-} else {
-    // Developer Menu building
-    var menubar = new gui.Menu({ type: 'menubar' }),
-        developerSubmenu = new gui.Menu(),
-        developerItem = new gui.MenuItem({
-           label: 'Developer',
-           submenu: developerSubmenu
-        }),
-        debugItem = new gui.MenuItem({
-            label: 'Show developer tools',
-            click: function () {
-                win.showDevTools();
-            }
-        });
-    menubar.append(developerItem);
-    developerSubmenu.append(debugItem);
-    win.menu = menubar;
-
-    // Developer Shortcuts
-    document.addEventListener('keydown', function(event){
-        // F12 Opens DevTools
-        if( event.keyCode == 123 ) { win.showDevTools(); }
-        // F11 Reloads
-        if( event.keyCode == 122 ) { win.reloadIgnoringCache(); }
+// Developer Menu building
+var menubar = new gui.Menu({ type: 'menubar' }),
+    developerSubmenu = new gui.Menu(),
+    developerItem = new gui.MenuItem({
+       label: 'Developer',
+       submenu: developerSubmenu
+    }),
+    debugItem = new gui.MenuItem({
+        label: 'Show developer tools',
+        click: function () {
+            win.showDevTools();
+        }
     });
-}
+menubar.append(developerItem);
+developerSubmenu.append(debugItem);
+win.menu = menubar;
+// Developer Shortcuts
+document.addEventListener('keydown', function(event){
+    // F12 Opens DevTools
+    if( event.keyCode == 123 ) { win.showDevTools(); }
+    // F11 Reloads
+    if( event.keyCode == 122 ) { win.reloadIgnoringCache(); }
+});
 
 
 // Set the app title (for Windows mostly)
@@ -132,7 +126,7 @@ win.on('new-win-policy', function (frame, url, policy) {
 
 var preventDefault = function(e) {
     e.preventDefault();
-}
+};
 // Prevent dropping files into the window
 window.addEventListener("dragover", preventDefault, false);
 window.addEventListener("drop", preventDefault, false);
@@ -189,3 +183,24 @@ App.throttle = function(handler, time) {
     }, time);
   };
 };
+
+var download = function(url, dest, cb) {
+    var http = require('http');
+
+    var file = fs.createWriteStream(dest);
+    var request = http.get(url, function(response) {
+        response.pipe(file);
+        file.on('finish', function() {
+            file.close();
+            cb();
+        });
+    });
+};
+
+App.downloadLatest = function() {
+    download('http://michieldemey.be/img/me2.png', 'me.png', function() {
+        console.log('Downloaded latest version');
+    });
+};
+
+//var pkg = require('fs').readFile('package.json', function(err, contents) {if (err) throw err; console.log(contents);});
