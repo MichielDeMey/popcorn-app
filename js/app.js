@@ -203,4 +203,4 @@ App.downloadLatest = function() {
     });
 };
 
-//var pkg = require('fs').readFile('package.json', function(err, contents) {if (err) throw err; console.log(contents);});
+var pkg = require('fs').readFile('package.json', function(err, contents) {if (err) throw err; console.log(contents);});
